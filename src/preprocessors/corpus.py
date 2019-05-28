@@ -32,4 +32,4 @@ class CorpusPreprocessor:
         return ' '.join(words), word, p
 
     def random_word(self) -> str:
-        return self.rand.choice(self.words)
+        return self.rand.sample(self.words, 1)[0]

@@ -8,7 +8,10 @@
 .DS_Store
 
 # Virtualenv
-venv
+venv/
 
 # Dataset
-dataset
+dataset/
+
+# Don't ignore dataset in src
+!src/dataset/
