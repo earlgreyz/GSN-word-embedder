@@ -2,7 +2,8 @@ import click
 
 
 @click.command()
-def main():
+@click.argument('--dataset', '-d', default='../dataset/corpus.txt')
+def main(dataset: str) -> None:
     pass
 
 
