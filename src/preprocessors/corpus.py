@@ -1,23 +1,20 @@
 import random
 import re
-from typing import Any, Tuple
+from typing import Any, Tuple, List
 
 
 class CorpusPreprocessor:
     def __init__(self, mask: str, seed: Any = None):
         self.mask = mask
         self.rand = random.Random(seed)
-        self.words = set()
+        self.words: List[str] = []
 
     def transform_text(self, text: str) -> str:
         # Keep only letters and spaces
         text = re.sub(r'[^a-zA-ZąĄćĆęĘłŁńŃóÓśŚżŻźŹ ]', '', text)
         # Replace consecutive spaces with a single space and strip
         text = re.sub(r' +', ' ', text)
-        text = text.strip()
-        # Add all words to the set of known words
-        self.words.update(text.split(' '))
-        return text
+        return text.strip()
 
     def mask_text(self, text: str) -> Tuple[str, str, int]:
         words = text.split(' ')
@@ -32,4 +29,4 @@ class CorpusPreprocessor:
         return ' '.join(words), word, p
 
     def random_word(self) -> str:
-        return self.rand.sample(self.words, 1)[0]
+        return self.rand.choice(self.words)

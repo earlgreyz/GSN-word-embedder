@@ -4,7 +4,14 @@ import torch
 from torch import cuda
 from torch.utils.data import DataLoader, random_split
 
-from dataset.text import TextDataset
+from dataset.corpus import Corpus
+from dataset.words import WordsDataset
+
+
+def split_size(percentage, size):
+    N = int(percentage * size)
+    M = size - N
+    return N, M
 
 
 @click.command()
@@ -22,15 +29,18 @@ def main(dataset: str, mask: str, limit: int, seed: int,
     click.secho('Using device={}'.format(device), fg='blue')
 
     # Instantiate data sets
-    click.echo('Loading dataset from \'{}\', using {}% as validation dataset'.format(dataset, validation * 100))
+    click.echo('Loading dataset \'{}\', using {}% as validation dataset'.format(dataset, validation * 100))
 
-    data = TextDataset(path=dataset, mask=mask, limit=limit, seed=seed)
-    N = int(validation * len(data))
-    test_data, train_data = random_split(dataset=data, lengths=[N, len(data) - N])
+    corpus = Corpus(path=dataset, mask=mask, seed=seed, limit=limit)
+    words_dataset = WordsDataset(corpus=corpus)
+    words_test, words_train = random_split(dataset=words_dataset, lengths=split_size(validation, len(words_dataset)))
 
     # Instantiate data loaders
-    train_loader = DataLoader(dataset=train_data, shuffle=True, batch_size=batch_size, num_workers=workers)
-    test_loader = DataLoader(dataset=test_data, shuffle=True, batch_size=batch_size, num_workers=workers)
+    words_train_loader = DataLoader(dataset=words_train, shuffle=True, batch_size=batch_size, num_workers=workers)
+    words_test_loader = DataLoader(dataset=words_test, shuffle=True, batch_size=batch_size, num_workers=workers)
+
+    for word in words_train_loader:
+        print(word)
 
 
 if __name__ == '__main__':
