@@ -14,12 +14,13 @@ from utils import split_size, text
 @click.option('--limit', '-l', default=0, help='use only first l lines from the dataset file')
 @click.option('--mask', '-m', default='?', help='text used to replace a masked word')
 @click.option('--seed', '-s', default=None, help='seed for the PRNG')
-@click.option('--encoding', '-e', default=48, help='initial encoding length')
+@click.option('--char-align', default=48, help='alignment of characters in a single word')
+@click.option('--word-align', default=128, help='alignment of words in a single sentence')
 @click.option('--validation', '-v', default=0.2, help='percentage of the dataset used for validation')
 @click.option('--batch-size', '-b', default=1000)
 @click.option('--workers', '-w', default=2, help='number of workers in the data loader')
 def main(path: str, limit: int,
-         mask: str, seed: int, encoding: int,
+         mask: str, seed: int, char_align: int, word_align: int,
          validation: float, batch_size: int, workers: int) -> None:
     # Check if cuda is available
     device = torch.device('cuda:0' if cuda.is_available() else 'cpu')
@@ -29,7 +30,7 @@ def main(path: str, limit: int,
     click.echo('Loading dataset \'{}\', using {}% as validation dataset'.format(path, validation * 100))
 
     preprocessor = CorpusPreprocessor(mask=mask, seed=seed)
-    encoder = text.TensorEncoder(encoding_length=encoding)
+    encoder = text.TensorEncoder(char_align=char_align, word_align=word_align)
 
     dataset = CorpusDataset(path=path, limit=limit, preprocessor=preprocessor, encoder=encoder)
     validation_data, train_data = random_split(dataset=dataset, lengths=split_size(validation, len(dataset)))
@@ -38,8 +39,8 @@ def main(path: str, limit: int,
     train_loader = DataLoader(dataset=train_data, shuffle=True, batch_size=batch_size, num_workers=workers)
     validation_loader = DataLoader(dataset=validation_data, batch_size=batch_size, num_workers=workers)
 
-    for word in train_loader:
-        print(word)
+    for word, _ in train_loader:
+        print(word.shape)
 
 
 if __name__ == '__main__':

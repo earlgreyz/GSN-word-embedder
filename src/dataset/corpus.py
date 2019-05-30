@@ -10,7 +10,7 @@ from utils.text import TensorEncoder
 
 class CorpusDataset(Dataset):
     def __init__(self, path: str, preprocessor: CorpusPreprocessor, encoder: TensorEncoder, limit: int = 0):
-        self.samples: List[Tuple[List[torch.Tensor], int]] = []
+        self.samples: List[Tuple[torch.Tensor, int]] = []
         with open(path) as f:
             # Load only portion of dataset if limit is specified
             lines = itertools.islice(f, limit) if limit > 0 else f
@@ -20,12 +20,11 @@ class CorpusDataset(Dataset):
             for line in lines:
                 sentence, masked, valid = preprocessor.mask_text(line)
                 # Transform text into tensors
-                words = [encoder.encode(word) for word in sentence.split()]
-                words.append(encoder.encode(masked))
-                self.samples.append((words, valid))
+                sample = encoder.encode_sentence('{} # {}'.format(sentence, masked))
+                self.samples.append((sample, valid))
 
     def __len__(self) -> int:
         return len(self.samples)
 
-    def __getitem__(self, item: int) -> Tuple[List[torch.Tensor], int]:
+    def __getitem__(self, item: int) -> Tuple[torch.Tensor, int]:
         return self.samples[item]
