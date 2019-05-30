@@ -3,7 +3,7 @@ from typing import Any, Tuple
 
 from torch.utils.data import Dataset
 
-from preprocessors.corpus import CorpusPreprocessor
+from preprocessor import CorpusPreprocessor
 
 
 class CorpusDataset(Dataset):

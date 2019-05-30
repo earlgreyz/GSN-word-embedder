@@ -4,13 +4,8 @@ import torch
 from torch import cuda
 from torch.utils.data import DataLoader, random_split
 
-from dataset.corpus import CorpusDataset
-
-
-def split_size(percentage, size):
-    N = int(percentage * size)
-    M = size - N
-    return N, M
+from dataset import CorpusDataset
+from utils import split_size
 
 
 @click.command()
