@@ -9,11 +9,8 @@ from utils.text import TensorEncoder
 
 
 class CorpusDataset(Dataset):
-    def __init__(self, path: str, limit: int = 0, mask: str = '?', seed=None, encoding_length: int = 48):
-        preprocessor = CorpusPreprocessor(mask, seed)
-        encoder = TensorEncoder(encoding_length)
+    def __init__(self, path: str, preprocessor: CorpusPreprocessor, encoder: TensorEncoder, limit: int = 0):
         self.samples: List[Tuple[List[torch.Tensor], int]] = []
-
         with open(path) as f:
             # Load only portion of dataset if limit is specified
             lines = itertools.islice(f, limit) if limit > 0 else f
