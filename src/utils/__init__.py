@@ -1,4 +1,2 @@
-def split_size(percentage, size):
-    N = int(percentage * size)
-    M = size - N
-    return N, M
+from .data import split_size
+from .stats import RunningAverage
