@@ -10,13 +10,14 @@ from utils import split_size
 
 @click.command()
 @click.option('--path', '-p', default='../dataset/corpus.txt', help='path of the dataset file')
-@click.option('--mask', '-m', default='?', help='text used to replace a masked word')
 @click.option('--limit', '-l', default=0, help='use only first l lines from the dataset file')
+@click.option('--mask', '-m', default='?', help='text used to replace a masked word')
 @click.option('--seed', '-s', default=None, help='seed for the PRNG')
 @click.option('--validation', '-v', default=0.2, help='percentage of the dataset used for validation')
 @click.option('--batch-size', '-b', default=1000)
 @click.option('--workers', '-w', default=2, help='number of workers in the data loader')
-def main(path: str, mask: str, limit: int, seed: int,
+def main(path: str, limit: int,
+         mask: str, seed: int,
          validation: float, batch_size: int, workers: int) -> None:
     # Check if cuda is available
     device = torch.device('cuda:0' if cuda.is_available() else 'cpu')
@@ -25,7 +26,7 @@ def main(path: str, mask: str, limit: int, seed: int,
     # Instantiate data sets
     click.echo('Loading dataset \'{}\', using {}% as validation dataset'.format(path, validation * 100))
 
-    dataset = CorpusDataset(path=path, mask=mask, seed=seed, limit=limit)
+    dataset = CorpusDataset(path=path, limit=limit, mask=mask, seed=seed)
     validation_data, train_data = random_split(dataset=dataset, lengths=split_size(validation, len(dataset)))
 
     # Instantiate data loaders
