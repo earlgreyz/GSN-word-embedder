@@ -1,14 +1,32 @@
 import random
 import re
-from typing import Any, Tuple, List
+from typing import Any, Tuple, Set
+
+
+def cache_corpus(func):
+    """
+    Wraps a method causing it to store its results in the `corpus` field.
+    Each time a function is called words from the returned sentence are
+    added to the `corpus` member field.
+    :param func: function to wrap
+    :return: the result of the `func` function
+    """
+
+    def wrapped(self, *args, **kwargs) -> str:
+        text = func(self, *args, **kwargs)
+        self.corpus.update(text.split())
+        return text
+
+    return wrapped
 
 
 class CorpusPreprocessor:
     def __init__(self, mask: str, seed: Any = None):
         self.mask = mask
         self.rand = random.Random(seed)
-        self.words: List[str] = []
+        self.corpus: Set[str] = set()
 
+    @cache_corpus
     def transform_text(self, text: str) -> str:
         # Keep only letters and spaces
         text = re.sub(r'[^a-zA-ZąĄćĆęĘłŁńŃóÓśŚżŻźŹ ]', '', text)
@@ -29,4 +47,4 @@ class CorpusPreprocessor:
         return ' '.join(words), word, p
 
     def random_word(self) -> str:
-        return self.rand.choice(self.words)
+        return self.rand.sample(self.corpus, 1)[0]

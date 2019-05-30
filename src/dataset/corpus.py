@@ -1,26 +1,24 @@
 import itertools
-from typing import Any, List, Set
+from typing import Any, Tuple
+
+from torch.utils.data import Dataset
 
 from preprocessors.corpus import CorpusPreprocessor
 
 
-class Corpus:
+class CorpusDataset(Dataset):
     def __init__(self, path: str, mask: str, seed: Any = None, limit: int = 0):
-        self.preprocessor = CorpusPreprocessor(mask, seed)
+        preprocessor = CorpusPreprocessor(mask, seed)
         with open(path) as f:
             # Load only portion of dataset if limit is specified
             lines = itertools.islice(f, limit) if limit > 0 else f
-            # Cache for the corpus contents
-            self.sentences: List[str] = []
-            words: Set[str] = set()
-            # Transform the lines and cache the words in the corpus
-            for line in lines:
-                sentence = self.preprocessor.transform_text(line)
-                words.update(sentence.split(' '))
-                self.sentences.append(sentence)
-            # Update the preprocessor with the words in the corpus
-            self.preprocessor.words = list(words)
+            # First transform all the lines to cache words in corpus
+            lines = [preprocessor.transform_text(line) for line in lines]
+            # Transform lines into test format
+            self.samples = [preprocessor.mask_text(line) for line in lines]
 
-    @property
-    def words(self) -> List[str]:
-        return self.preprocessor.words
+    def __len__(self) -> int:
+        return len(self.samples)
+
+    def __getitem__(self, item: int) -> Tuple[str, str, int]:
+        return self.samples[item]
