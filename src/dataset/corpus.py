@@ -5,12 +5,12 @@ import torch
 from torch.utils.data import Dataset
 
 from preprocessor import CorpusPreprocessor
-from utils.text import TensorEncoder
+from utils import text
 
 
 class CorpusDataset(Dataset):
-    def __init__(self, path: str, preprocessor: CorpusPreprocessor, encoder: TensorEncoder, limit: int = 0):
-        self.samples: List[Tuple[torch.Tensor, int]] = []
+    def __init__(self, path: str, preprocessor: CorpusPreprocessor, encoder: text.Encoder, limit: int = 0):
+        self.samples: List[Tuple[torch.Tensor, torch.Tensor]] = []
         with open(path) as f:
             # Load only portion of dataset if limit is specified
             lines = itertools.islice(f, limit) if limit > 0 else f
@@ -19,12 +19,11 @@ class CorpusDataset(Dataset):
             # Transform lines into test format
             for line in lines:
                 sentence, masked, valid = preprocessor.mask_text(line)
-                # Transform text into tensors
-                sample = encoder.encode_sentence('{} # {}'.format(sentence, masked))
-                self.samples.append((sample, valid))
+                sample = encoder.encode_sentence(' '.join([sentence, masked]))
+                self.samples.append((sample, torch.tensor(valid)))
 
     def __len__(self) -> int:
         return len(self.samples)
 
-    def __getitem__(self, item: int) -> Tuple[torch.Tensor, int]:
+    def __getitem__(self, item: int) -> Tuple[torch.Tensor, torch.Tensor]:
         return self.samples[item]
