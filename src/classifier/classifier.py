@@ -1,7 +1,7 @@
 import click
+
 import torch
 from torch import cuda
-
 from torch.optim import adam
 import torch.nn.functional as F
 

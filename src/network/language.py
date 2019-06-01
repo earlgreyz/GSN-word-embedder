@@ -9,7 +9,7 @@ class Language(nn.Module):
         super().__init__()
         self.hidden_size = hidden_size
         self.embedder = Embedder(alignment, alphabet_size, embedding_size)
-        self.rnn = nn.RNN(embedding_size, hidden_size, 1, batch_first=True, bidirectional=True)
+        self.lstm = nn.LSTM(embedding_size, hidden_size, 1, batch_first=True, bidirectional=True)
         self.fc = nn.Linear(hidden_size * 2, 2)
 
     def forward(self, x: torch.Tensor) -> (torch.Tensor, torch.Tensor):
@@ -18,11 +18,7 @@ class Language(nn.Module):
         x = self.embedder(x)
         x = x.reshape(N, M, -1)
 
-        hidden = torch.zeros(2, N, self.hidden_size)
-        if cuda.is_available():
-            hidden = hidden.to('cuda')
-
-        out, hidden = self.rnn(x, hidden)
+        out, hidden = self.lstm(x)
         out = out[:, M - 1, :]
         out = self.fc(out)
         return out, hidden

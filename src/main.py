@@ -25,9 +25,9 @@ desired_accuracy = .6
 @click.option('--epochs', '-e', default=5, help='number of epochs')
 @click.option('--mask', '-m', default='?', help='text used to replace a masked word')
 @click.option('--seed', '-s', default=None, help='seed for the PRNG')
-@click.option('--align', '-a', default=48, help='alignment of characters in a single word')
+@click.option('--align', '-a', default=64, help='alignment of characters in a single word')
 @click.option('--validation', '-v', default=0.2, help='percentage of the dataset used for validation')
-@click.option('--batch-size', '-b', default=1000)
+@click.option('--batch-size', '-b', default=100)
 @click.option('--workers', '-w', default=2, help='number of workers in the data loader')
 @click.option('--no-train', is_flag=True, default=False)
 @click.option('--no-test', is_flag=True, default=False)
@@ -44,7 +44,7 @@ def main(path: str, limit: int,
     encoder = text.Encoder(alignment=align)
 
     # Load net
-    net = network.Language(alignment=align, alphabet_size=encoder.N, embedding_size=32)
+    net = network.Language(alignment=align, alphabet_size=encoder.N, embedding_size=16)
     net.to(device)
 
     if load_model is not None:
