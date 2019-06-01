@@ -1,20 +1,22 @@
-from typing import Union
-
+import torch
 from torch import nn
 import torch.nn.functional as F
 
-from utils import text
-
 
 class Embedder(nn.Module):
-    def __init__(self, embedding_size: int, encoder: text.Encoder,
-                 out: int = 32, kernel: Union[int, tuple] = 3, pool: int = 2):
+    def __init__(self, alignment: int, alphabet_size: int, embedding_size: int,
+                 kernel_size: int = 3, pool_size: int = 2):
         super().__init__()
-        self.encoder = encoder
-        self.convolution = nn.Conv2d(1, out, kernel, padding=1)
-        self.pool = nn.MaxPool2d(pool)
-        self.full = nn.Linear(out, embedding_size)
+        self.conv = nn.Conv1d(alignment, embedding_size, kernel_size=kernel_size)
+        self.pool = nn.MaxPool2d(pool_size)
+        self.bn = nn.BatchNorm1d(embedding_size)
+        n = (alphabet_size - kernel_size) // pool_size
+        m = embedding_size // pool_size
+        self.fc = nn.Linear(n * m, embedding_size)
 
-    def forward(self, x):
-        x = self.pool(F.relu(self.convolution(x)))
-        return self.full(x)
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        in_size = x.size(0)
+        x = self.pool(self.bn(F.relu(self.conv(x))))
+        x = x.view(in_size, -1)
+        x = self.fc(x)
+        return x

@@ -2,12 +2,12 @@ import click
 
 import torch
 from torch import cuda
-from torch.nn.utils.rnn import pack_padded_sequence
 from torch.utils.data import DataLoader, random_split
 
 from dataset import CorpusDataset
 from preprocessor import CorpusPreprocessor
 from utils import split_size, PadCollate, text
+from network.language import Language
 
 
 @click.command()
@@ -15,7 +15,7 @@ from utils import split_size, PadCollate, text
 @click.option('--limit', '-l', default=0, help='use only first l lines from the dataset file')
 @click.option('--mask', '-m', default='?', help='text used to replace a masked word')
 @click.option('--seed', '-s', default=None, help='seed for the PRNG')
-@click.option('--align', default=48, help='alignment of characters in a single word')
+@click.option('--align', '-a', default=48, help='alignment of characters in a single word')
 @click.option('--validation', '-v', default=0.2, help='percentage of the dataset used for validation')
 @click.option('--batch-size', '-b', default=1000)
 @click.option('--workers', '-w', default=2, help='number of workers in the data loader')
@@ -35,13 +35,16 @@ def main(path: str, limit: int,
     validation_data, train_data = random_split(dataset=dataset, lengths=split_size(validation, len(dataset)))
 
     # Instantiate data loaders
-    train_loader = DataLoader(dataset=train_data, shuffle=True, batch_size=batch_size, num_workers=workers,
-                              collate_fn=PadCollate(dim=0))
-    validation_loader = DataLoader(dataset=validation_data, batch_size=batch_size, num_workers=workers,
-                                   collate_fn=PadCollate(dim=0))
+    pad_collate = PadCollate(dim=0)
+    train_loader = DataLoader(
+        dataset=train_data, batch_size=batch_size, shuffle=True, num_workers=workers, collate_fn=pad_collate)
+    validation_loader = DataLoader(
+        dataset=validation_data, batch_size=batch_size, num_workers=workers, collate_fn=pad_collate)
 
+    # Run training
+    net = Language(alignment=align, alphabet_size=encoder.N, embedding_size=32)
     for xs, ys in train_loader:
-        print(xs.shape, ys.shape)
+        print(net(xs).shape)
 
 
 if __name__ == '__main__':
