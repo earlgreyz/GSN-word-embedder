@@ -13,5 +13,8 @@ venv/
 # Dataset
 dataset/
 
+# Output
+output/
+
 # Don't ignore dataset in src
 !src/dataset/
