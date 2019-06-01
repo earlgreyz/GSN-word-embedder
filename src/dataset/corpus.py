@@ -10,7 +10,7 @@ from utils import text
 
 class CorpusDataset(Dataset):
     def __init__(self, path: str, preprocessor: CorpusPreprocessor, encoder: text.Encoder, limit: int = 0):
-        self.samples: List[Tuple[torch.Tensor, torch.Tensor]] = []
+        self.samples = []
         with open(path) as f:
             # Load only portion of dataset if limit is specified
             lines = itertools.islice(f, limit) if limit > 0 else f
@@ -19,7 +19,7 @@ class CorpusDataset(Dataset):
             # Transform lines into test format
             for line in lines:
                 sentence, masked, valid = preprocessor.mask_text(line)
-                sample = encoder.encode_sentence(' '.join([sentence, masked]))
+                sample = encoder.encode_sentence(' '.join([sentence, '#', masked]))
                 self.samples.append((sample, torch.tensor(valid)))
 
     def __len__(self) -> int:

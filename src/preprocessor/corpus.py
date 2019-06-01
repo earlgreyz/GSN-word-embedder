@@ -24,7 +24,7 @@ class CorpusPreprocessor:
     def __init__(self, mask: str, seed: Any = None):
         self.mask = mask
         self.rand = random.Random(seed)
-        self.corpus: Set[str] = set()
+        self.corpus = set()
 
     @cache_corpus
     def transform_text(self, text: str) -> str:

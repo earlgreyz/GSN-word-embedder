@@ -1,5 +1,5 @@
 import torch
-from torch import nn
+from torch import cuda, nn
 
 from network.embedder import Embedder
 
@@ -19,8 +19,10 @@ class Language(nn.Module):
         x = x.reshape(N, M, -1)
 
         hidden = torch.zeros(2, N, self.hidden_size)
+        if cuda.is_available():
+            hidden = hidden.to('cuda')
+
         out, hidden = self.rnn(x, hidden)
-        #out = out.contiguous().view(-1, out.shape[2])
         out = out[:, M - 1, :]
         out = self.fc(out)
         return out, hidden

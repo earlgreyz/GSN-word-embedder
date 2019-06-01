@@ -3,15 +3,15 @@ from typing import Dict
 import numpy as np
 import torch
 
-ALPHABET_PL = 'aAąĄbBcCćĆdDeEęĘfFgGhHiIjJkKlLłŁmMnNńŃoOóÓpPqQrRsSśŚtTuUvVwWxXyYzZżŻźŹ?'
+ALPHABET_PL = 'aAąĄbBcCćĆdDeEęĘfFgGhHiIjJkKlLłŁmMnNńŃoOóÓpPqQrRsSśŚtTuUvVwWxXyYzZżŻźŹ?#'
 
 
 class Encoder:
     def __init__(self, alignment: int, alphabet: str = ALPHABET_PL):
         self.char_align = alignment
         self.N = len(alphabet)
-        self.int2char: Dict[int, str] = dict(enumerate(alphabet))
-        self.char2int: Dict[str, int] = {char: i for i, char in self.int2char.items()}
+        self.int2char = dict(enumerate(alphabet))
+        self.char2int = {char: i for i, char in self.int2char.items()}
 
     def encode_word(self, text: str) -> torch.Tensor:
         if self.char_align < len(text):

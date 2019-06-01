@@ -10,7 +10,7 @@ class Embedder(nn.Module):
         self.conv = nn.Conv1d(alignment, embedding_size, kernel_size=kernel_size)
         self.pool = nn.MaxPool2d(pool_size)
         self.bn = nn.BatchNorm1d(embedding_size)
-        n = (alphabet_size - kernel_size) // pool_size
+        n = (alphabet_size - 1) // pool_size
         m = embedding_size // pool_size
         self.fc = nn.Linear(n * m, embedding_size)
 
