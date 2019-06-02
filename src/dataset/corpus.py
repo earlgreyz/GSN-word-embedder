@@ -1,5 +1,5 @@
 import itertools
-from typing import Tuple, List
+from typing import Tuple
 
 import torch
 from torch.utils.data import Dataset

@@ -13,8 +13,6 @@ from utils import split_size, PadCollate, text
 from classifier import Classifier
 import network
 
-desired_accuracy = .6
-
 
 @click.command()
 @click.option('--path', '-p', default='../dataset/corpus.txt', help='path of the dataset file')
@@ -30,12 +28,11 @@ desired_accuracy = .6
 @click.option('--batch-size', '-b', default=100)
 @click.option('--workers', '-w', default=2, help='number of workers in the data loader')
 @click.option('--no-train', is_flag=True, default=False)
-@click.option('--no-test', is_flag=True, default=False)
 def main(path: str, limit: int,
          load_model: str, save_model: str, learning_rate: float, epochs: int,
          mask: str, seed: int, align: int,
          validation: float, batch_size: int, workers: int,
-         no_train: bool, no_test: bool) -> None:
+         no_train: bool) -> None:
     # Check if cuda is available
     device = torch.device('cuda:0' if cuda.is_available() else 'cpu')
     click.secho('Using device={}'.format(device), fg='blue')
@@ -71,13 +68,10 @@ def main(path: str, limit: int,
         click.secho('Training model', fg='blue')
         net.train()
         classifier.train(train_loader, test_loader, epochs)
-
-    if not no_test:
+    else:
         click.secho('Testing model', fg='blue')
         net.eval()
-        accuracy = classifier.test(test_loader)
-        color = 'green' if accuracy > desired_accuracy else 'red'
-        click.secho('Accuracy={}'.format(accuracy), fg=color)
+        classifier.test(test_loader)
 
     if save_model is not None and not no_train:
         suffix = time.strftime("%Y%m%d-%H%M%S")

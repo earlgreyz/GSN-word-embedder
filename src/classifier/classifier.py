@@ -9,9 +9,10 @@ from utils import RunningAverage
 
 
 class Classifier:
-    def __init__(self, net, lr=0.1):
+    def __init__(self, net, lr: float = .1, desired_accuracy: float = .6):
         self.net = net
         self.optimizer = adam.Adam(net.parameters(), lr=lr)
+        self.desired_accuracy = desired_accuracy
         self.criterion = F.cross_entropy
 
     def train(self, train_loader, test_loader, num_epochs):
@@ -36,7 +37,7 @@ class Classifier:
                 self.optimizer.zero_grad()
 
                 # forward + backward + optimize
-                outputs, _ = self.net(inputs)
+                outputs = self.net(inputs)
                 loss = self.criterion(outputs, targets)
                 loss.backward()
                 self.optimizer.step()
@@ -55,10 +56,12 @@ class Classifier:
                 if cuda.is_available():
                     inputs, targets = inputs.to('cuda'), targets.to('cuda')
 
-                outputs, _ = self.net(inputs)
+                outputs = self.net(inputs)
                 _, predicted = torch.max(outputs.data, 1)
 
                 correct = (predicted == targets)
                 accuracy.update(correct.sum().item(), targets.size(0))
 
+        color = 'green' if accuracy.average > self.desired_accuracy else 'red'
+        click.secho('Accuracy={}'.format(accuracy.average), fg=color)
         return accuracy.average
