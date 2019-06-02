@@ -1,3 +1,5 @@
+import click
+
 import itertools
 from typing import Tuple
 
@@ -17,10 +19,11 @@ class CorpusDataset(Dataset):
             # First transform all the lines to cache words in corpus
             lines = [preprocessor.transform_text(line) for line in lines]
             # Transform lines into test format
-            for line in lines:
-                sentence, masked, valid = preprocessor.mask_text(line)
-                sample = encoder.encode_sentence(' '.join([sentence, '#', masked]))
-                self.samples.append((sample, torch.tensor(valid)))
+            with click.progressbar(lines) as bar:
+                for line in bar:
+                    sentence, masked, valid = preprocessor.mask_text(line)
+                    sample = encoder.encode_sentence(' '.join([sentence, '#', masked]))
+                    self.samples.append((sample, torch.tensor(valid)))
 
     def __len__(self) -> int:
         return len(self.samples)
