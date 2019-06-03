@@ -15,7 +15,7 @@ class Language(nn.Module):
         self.lstm = nn.LSTM(embedding_size, hidden_size, batch_first=True, bidirectional=True)
         self.fc = nn.Linear(hidden_size * 2, 2)
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: torch.Tensor, l: torch.Tensor) -> torch.Tensor:
         N, M, W, L = x.shape
         # Reshape such that embedder gets a batch of encoded words
         x = x.reshape(N * M, W, L)
@@ -25,7 +25,9 @@ class Language(nn.Module):
         x = x.reshape(N, M, self.embedding_size)
         # Run LSTM on the sentences
         x, _ = self.lstm(x)
-        x = x[:, M - 1, :].squeeze(1)
+        out = torch.zeros((N, self.hidden_size * 2), device=x.device)
+        for i in range(N):
+            out[i, :] = x[i, l[i], :].squeeze()
         # Fully connected layer to output classes
-        x = self.fc(x)
-        return x
+        out = self.fc(out)
+        return out

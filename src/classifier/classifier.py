@@ -29,15 +29,15 @@ class Classifier:
         show_stats = lambda _: '[{}, {:3f}]'.format(epoch + 1, running_loss.average)
 
         with click.progressbar(loader, item_show_func=show_stats) as bar:
-            for inputs, targets in bar:
+            for inputs, lengths, targets in bar:
                 if cuda.is_available():
-                    inputs, targets = inputs.to('cuda'), targets.to('cuda')
+                    inputs, lengths, targets = inputs.to('cuda'), lengths.to('cuda'), targets.to('cuda')
 
                 # zero the parameter gradients
                 self.optimizer.zero_grad()
 
                 # forward + backward + optimize
-                outputs = self.net(inputs)
+                outputs = self.net(inputs, lengths)
                 loss = self.criterion(outputs, targets)
                 loss.backward()
                 self.optimizer.step()
@@ -52,11 +52,11 @@ class Classifier:
         show_stats = lambda _: '[{:2f}]'.format(accuracy.average)
 
         with click.progressbar(loader, item_show_func=show_stats) as bar:
-            for inputs, targets in bar:
+            for inputs, lengths, targets in bar:
                 if cuda.is_available():
-                    inputs, targets = inputs.to('cuda'), targets.to('cuda')
+                    inputs, lengths, targets = inputs.to('cuda'), lengths.to('cuda'), targets.to('cuda')
 
-                outputs = self.net(inputs)
+                outputs = self.net(inputs, lengths)
                 _, predicted = torch.max(outputs.data, 1)
 
                 correct = (predicted == targets)

@@ -16,7 +16,7 @@ def pad_tensor(x: torch.Tensor, pad: int, dim: int) -> torch.Tensor:
     return torch.cat([x, torch.zeros(*pad_size)], dim=dim)
 
 
-Batch = Tuple[torch.Tensor, torch.Tensor]
+Batch = Tuple[torch.Tensor, torch.Tensor, torch.Tensor]
 
 
 class PadCollate:
@@ -25,9 +25,10 @@ class PadCollate:
 
     def pad_collate(self, batch: List[Batch]) -> Batch:
         N = max(map(lambda x: x[0].shape[self.dim], batch))
+        ls = torch.stack(list(map(lambda x: torch.tensor(x[0].shape[self.dim] - 1), batch)))
         xs = torch.stack(list(map(lambda x: pad_tensor(x[0], pad=N, dim=self.dim), batch)))
         ys = torch.stack(list(map(lambda x: x[1], batch)))
-        return xs, ys
+        return xs, ls, ys
 
     def __call__(self, batch: List[Batch]) -> Batch:
         return self.pad_collate(batch)
