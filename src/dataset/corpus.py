@@ -17,9 +17,12 @@ class CorpusDataset(Dataset):
             # Load only portion of dataset if limit is specified
             lines = itertools.islice(f, limit) if limit > 0 else f
             # First transform all the lines to cache words in corpus
-            lines = [preprocessor.transform_text(line) for line in lines]
+            sentences = []
+            with  click.progressbar(lines, label='Transforming sentences') as bar:
+                for line in bar:
+                    sentences.append(preprocessor.transform_text(line))
             # Transform lines into test format
-            with click.progressbar(lines) as bar:
+            with click.progressbar(sentences, label='Encoding sentences') as bar:
                 for line in bar:
                     sentence, masked, valid = preprocessor.mask_text(line)
                     sample = encoder.encode_sentence(' '.join([sentence, '#', masked]))
