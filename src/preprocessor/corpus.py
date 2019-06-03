@@ -1,6 +1,6 @@
 import random
 import re
-from typing import Any, Tuple, Set
+from typing import Any, Tuple
 
 
 def cache_corpus(func):
