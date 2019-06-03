@@ -11,6 +11,7 @@ from dataset import CorpusDataset
 from preprocessor import CorpusPreprocessor
 from utils import split_size, PadCollate, text
 from classifier import Classifier
+from callbacks import SaverCallback, LoggerCallback
 import network
 
 
@@ -27,12 +28,13 @@ import network
 @click.option('--validation', '-v', default=0.2, help='percentage of the dataset used for validation')
 @click.option('--batch-size', '-b', default=100)
 @click.option('--workers', '-w', default=2, help='number of workers in the data loader')
+@click.option('--logs-path', '-t', default='../logs/', help='logs for the tensorboard')
 @click.option('--no-train', is_flag=True, default=False)
 def main(path: str, limit: int,
          load_model: str, save_model: str, learning_rate: float, epochs: int,
          mask: str, seed: int, align: int,
          validation: float, batch_size: int, workers: int,
-         no_train: bool) -> None:
+         logs_path: str, no_train: bool) -> None:
     # Check if cuda is available
     device = torch.device('cuda:0' if cuda.is_available() else 'cpu')
     click.secho('Using device={}'.format(device), fg='blue')
@@ -62,7 +64,7 @@ def main(path: str, limit: int,
         dataset=validation_data, batch_size=batch_size, num_workers=workers, collate_fn=pad_collate)
 
     # Run training
-    classifier = Classifier(net, lr=learning_rate)
+    classifier = Classifier(net, lr=learning_rate, callbacks=[SaverCallback(save_model), LoggerCallback(logs_path)])
 
     if not no_train:
         click.secho('Training model', fg='blue')
@@ -72,12 +74,6 @@ def main(path: str, limit: int,
         click.secho('Testing model', fg='blue')
         net.eval()
         classifier.test(test_loader)
-
-    if save_model is not None and not no_train:
-        suffix = time.strftime("%Y%m%d-%H%M%S")
-        name = 'model_' + suffix
-        click.secho('Saving model as \'{}\''.format(name), fg='yellow')
-        torch.save(net.state_dict(), os.path.join(save_model, name))
 
 
 if __name__ == '__main__':

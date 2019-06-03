@@ -1,3 +1,5 @@
+from typing import List
+
 import click
 
 import torch
@@ -5,24 +7,30 @@ from torch import cuda
 from torch.optim import adam
 import torch.nn.functional as F
 
+from callbacks import Callback
 from utils import RunningAverage
 
 
 class Classifier:
-    def __init__(self, net, lr: float = .1, desired_accuracy: float = .6):
+    def __init__(self, net, lr: float = .1, desired_accuracy: float = .6, callbacks: List[Callback] = None):
         self.net = net
         self.optimizer = adam.Adam(net.parameters(), lr=lr)
         self.desired_accuracy = desired_accuracy
         self.criterion = F.cross_entropy
+        self.callbacks = []
+        if callbacks is not None:
+            self.callbacks = callbacks
 
     def train(self, train_loader, test_loader, num_epochs):
         for epoch in range(num_epochs):
             click.echo('Training epoch {}'.format(epoch))
             self.net.train()
-            self._train_epoch(epoch=epoch, loader=train_loader)
+            loss = self._train_epoch(epoch=epoch, loader=train_loader)
             click.echo('Testing epoch {}'.format(epoch))
             self.net.eval()
-            self.test(test_loader)
+            accuracy = self.test(test_loader)
+            for callback in self.callbacks:
+                callback(net=self.net, epoch=epoch, loss=loss, accuracy=accuracy)
 
     def _train_epoch(self, epoch, loader) -> float:
         running_loss = RunningAverage()

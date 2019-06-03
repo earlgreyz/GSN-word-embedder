@@ -15,6 +15,7 @@ dataset/
 
 # Output
 output/
+logs/
 
 # Don't ignore dataset in src
 !src/dataset/
