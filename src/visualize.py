@@ -1,5 +1,9 @@
 import click
 
+import numpy as np
+from sklearn.manifold import TSNE
+import matplotlib.pyplot as plt
+
 import torch
 from torch import cuda
 from torch.utils.data import DataLoader
@@ -37,6 +41,7 @@ def main(path: str, limit: int, load_model: str, align: int, batch_size: int, wo
     loader = DataLoader(dataset=data, batch_size=batch_size, num_workers=workers)
 
     # Create embeddings
+    click.echo('Creating embbeddings')
     embeddings = torch.zeros(len(data), net.embedding_size)
     net.eval()
     with click.progressbar(loader, label='Embedding words') as bar:
@@ -45,6 +50,20 @@ def main(path: str, limit: int, load_model: str, align: int, batch_size: int, wo
             N = inputs.size(0)
             embeddings[i:i + N, :] = net.embedder(inputs)
             i += N
+
+    click.echo('Creating model')
+    tsne_model = TSNE(perplexity=15, n_components=2, init='pca', n_iter=500, random_state=32, verbose=10)
+    tsne_embeddings = np.array(tsne_model.fit_transform(embeddings.detach().numpy()))
+    click.echo('Creating figure')
+    plt.figure(figsize=(40, 40))
+    x = tsne_embeddings[:, 0]
+    y = tsne_embeddings[:, 1]
+    plt.scatter(x, y)
+    for i, word in enumerate(data.words):
+        plt.annotate(word, alpha=0.5, xy=(x[i], y[i]), xytext=(5, 2), textcoords='offset points', ha='right',
+                     va='bottom', size=8)
+    plt.grid(True)
+    plt.show()
 
 
 if __name__ == '__main__':
