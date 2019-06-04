@@ -60,15 +60,15 @@
 
   \begin{table}[ht]
   \center
-  \begin{tabular}{|c|c|c|c|}
-  \hline
-  $i$ & $\texttt{s}_i$ & $\texttt{p}_i$ & $\gamma(s_i, p_i)$ \\ \hline
-  0 & strata & straty & 0.9986 \\ \hline
-  1 & miejsce & miejsca & 0.9864 \\ \hline
-  2 & umowa & umowy & 0.9990 \\ \hline
-  3 & firma & firmy & 0.9993 \\ \hline
-  4 & odprawa & odprawy & 0.9994 \\ \hline
-  \end{tabular}
+    \begin{tabular}{|c|c|c|c|}
+    \hline
+    $i$ & $\texttt{s}_i$ & $\texttt{p}_i$ & $\gamma(s_i, p_i)$ \\ \hline
+    0 & strata & straty & 0.9986 \\ \hline
+    1 & miejsce & miejsca & 0.9864 \\ \hline
+    2 & umowa & umowy & 0.9990 \\ \hline
+    3 & firma & firmy & 0.9993 \\ \hline
+    4 & odprawa & odprawy & 0.9994 \\ \hline
+    \end{tabular}
   \caption{Cosine similarity between singular and plural forms}
   \label{tab:sinpl_sim_words}
   \end{table}
@@ -101,5 +101,23 @@
   \label{tab:sinpl_diff}
   \end{table}
 
+  \section{Foreign Names cluster}
+  Foreign names seem to form a cluster, calculating cosine similarity between
+  all of the pairs confirm the prediction made based on the visualization.
 
+  \begin{table}[ht]
+  \center
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+    \hline
+     & George & Severus & Orton & Snape & Edwarda & Fordon \\ \hline
+    George & 1.0000 & 0.9967 & 0.9971 & 0.9950 & 0.9964 & 0.9969 \\ \hline
+    Severus & 0.9967 & 1.0000 & 0.9972 & 0.9950 & 0.9940 & 0.9946 \\ \hline
+    Orton & 0.9971 & 0.9972 & 1.0000 & 0.9982 & 0.9957 & 0.9965 \\ \hline
+    Snape & 0.9950 & 0.9950 & 0.9982 & 1.0000 & 0.9962 & 0.9951 \\ \hline
+    Edwarda & 0.9964 & 0.9940 & 0.9957 & 0.9962 & 1.0000 & 0.9989 \\ \hline
+    Fordon & 0.9969 & 0.9946 & 0.9965 & 0.9951 & 0.9989 & 1.0000 \\ \hline
+    \end{tabular}
+  \caption{Cosine similarity of foreign names}
+  \label{tab:foreign_names}
+  \end{table}
 \end{document}

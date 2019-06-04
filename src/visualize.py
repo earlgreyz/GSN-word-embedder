@@ -61,6 +61,26 @@ def pair_similarity(embeddings, data, pairs):
         print('{} & {} & {} & {:.4f} \\\\ \\hline'.format(i, pairs[i][0], pairs[i][1], s))
 
 
+def all_pairs_similarity(embeddings, data, words):
+    es = []
+    for word in words:
+        i = data.words.index(word)
+        e = embeddings[i, :].reshape(1, -1)
+        es.append(e)
+
+    print('& ', end='')
+    for w in words:
+        print('{} & '.format(w), end='')
+    print()
+
+    for wa, ea in zip(words, es):
+        print('{} & '.format(wa), end='')
+        for wb, eb in zip(words, es):
+            s = cosine_similarity(ea, eb).item()
+            print('{:.4f} & '. format(s), end='')
+        print('')
+
+
 @click.command()
 @click.option('--path', '-p', default='../dataset/corpus.txt', help='path of the dataset file')
 @click.option('--limit', '-l', default=0, help='use only first l lines from the dataset file')
@@ -71,8 +91,9 @@ def pair_similarity(embeddings, data, pairs):
 @click.option('--graph', is_flag=True, default=False)
 @click.option('--check-relations', default=None)
 @click.option('--check-pairs', default=None)
+@click.option('--check-all-pairs', default=None)
 def main(path: str, limit: int, load_model: str, align: int, batch_size: int, workers: int,
-         graph: bool, check_relations: bool, check_pairs: bool):
+         graph: bool, check_relations: bool, check_pairs: bool, check_all_pairs: bool):
     # Check if cuda is available
     device = torch.device('cuda:0' if cuda.is_available() else 'cpu')
     click.secho('Using device={}'.format(device), fg='blue')
@@ -113,6 +134,11 @@ def main(path: str, limit: int, load_model: str, align: int, batch_size: int, wo
         with open(check_pairs) as f:
             pairs = [tuple(line.strip().split(',')) for line in f]
             pair_similarity(embeddings, data, pairs)
+
+    if check_all_pairs is not None:
+        with open(check_all_pairs) as f:
+            words = [line.strip() for line in f]
+            all_pairs_similarity(embeddings, data, words)
 
     if graph:
         graph_embeddings(embeddings, data)
