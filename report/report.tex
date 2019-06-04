@@ -101,23 +101,56 @@
   \label{tab:sinpl_diff}
   \end{table}
 
-  \section{Foreign Names cluster}
-  Foreign names seem to form a cluster, calculating cosine similarity between
-  all of the pairs confirm the prediction made based on the visualization.
 
+  \section{Clusters}
+
+  Different groups of words which have the same role in the sentence seem to
+  form clustures. Calculating cosine similarity between all of the pairs confirm
+  this prediction made based on the visualization.
+
+  \subsection{Abbreviations}
+  Common polish abbreviations such as institutions (MSZ), different company names (CAG, KLM)
+  or even desease names (WZW) all fall into this category. Cosine similarity of
+  a small sample can be seen in the Table \ref{tab:abbreviations}.
   \begin{table}[ht]
   \center
     \begin{tabular}{|c|c|c|c|c|c|c|}
     \hline
-     & George & Severus & Orton & Snape & Edwarda & Fordon \\ \hline
+    & KLM & PiS & CAG & MSZ & ZOZy & WZW \\ \hline
+    KLM & 1.0000 & 0.9960 & 0.9971 & 0.9966 & 0.9944 & 0.9970 \\ \hline
+    PiS & 0.9960 & 1.0000 & 0.9954 & 0.9966 & 0.9966 & 0.9927 \\ \hline
+    CAG & 0.9971 & 0.9954 & 1.0000 & 0.9922 & 0.9889 & 0.9958 \\ \hline
+    MSZ & 0.9966 & 0.9966 & 0.9922 & 1.0000 & 0.9991 & 0.9886 \\ \hline
+    ZOZy & 0.9944 & 0.9966 & 0.9889 & 0.9991 & 1.0000 & 0.9868 \\ \hline
+    WZW & 0.9970 & 0.9927 & 0.9958 & 0.9886 & 0.9868 & 1.0000 \\ \hline
+    \end{tabular}
+  \caption{Cosine similarity of abbreviations}
+  \label{tab:abbreviations}
+  \end{table}
+
+  \subsection{Foreign names}
+  Vectors of names (Severus, George) and surnames (Snape, Fordon) borrowed
+  from English language also seem to be close to each other. Cosine similarity of
+  a small sample can be seen in the Table \ref{tab:foreign_names}.
+  \begin{table}[ht!]
+  \center
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+    \hline
+     & George & Severus & Orton & Snape & Edward & Fordon \\ \hline
     George & 1.0000 & 0.9967 & 0.9971 & 0.9950 & 0.9964 & 0.9969 \\ \hline
     Severus & 0.9967 & 1.0000 & 0.9972 & 0.9950 & 0.9940 & 0.9946 \\ \hline
     Orton & 0.9971 & 0.9972 & 1.0000 & 0.9982 & 0.9957 & 0.9965 \\ \hline
     Snape & 0.9950 & 0.9950 & 0.9982 & 1.0000 & 0.9962 & 0.9951 \\ \hline
-    Edwarda & 0.9964 & 0.9940 & 0.9957 & 0.9962 & 1.0000 & 0.9989 \\ \hline
+    Edward & 0.9964 & 0.9940 & 0.9957 & 0.9962 & 1.0000 & 0.9989 \\ \hline
     Fordon & 0.9969 & 0.9946 & 0.9965 & 0.9951 & 0.9989 & 1.0000 \\ \hline
     \end{tabular}
   \caption{Cosine similarity of foreign names}
   \label{tab:foreign_names}
   \end{table}
+
+  \section{Summary}
+  For deeper relations of the word embeddings like in \textit{word2vec} the
+  embedder model would have to be tweaked more precisely. However this simple
+  implementation already created interesting results such as word clusters of
+  semantically similar words.
 \end{document}

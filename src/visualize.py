@@ -125,6 +125,7 @@ def main(path: str, limit: int, load_model: str, align: int, batch_size: int, wo
             i += N
 
     embeddings = embeddings.detach().numpy()
+
     if check_relations is not None:
         with open(check_relations) as f:
             pairs = [tuple(line.strip().split(',')) for line in f]
