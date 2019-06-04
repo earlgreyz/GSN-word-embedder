@@ -41,11 +41,11 @@ def difference_similarity(embeddings, data, pairs):
 
     for i, (sa, pa) in enumerate(es):
         delta = pa - sa
-        print('{}-{},'.format(*pairs[i]), end='')
+        print('delta_\\langle s_{}, p_{} \\rangle & '.format(i, i), end='')
         for j, (sb, pb) in enumerate(es):
             s = cosine_similarity(sb + delta, pb)
-            print('{},'.format(s.item()), end='')
-        print('')
+            print('{:.4f} & '.format(s.item()), end='')
+        print(' \\\\\\hline')
 
 
 @click.command()

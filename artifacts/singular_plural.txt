@@ -1,4 +1,4 @@
-straty,strata
+strata,straty
 miejsce,miejsca
 umowa,umowy
 firma,firmy
