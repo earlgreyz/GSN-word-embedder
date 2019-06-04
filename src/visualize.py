@@ -47,6 +47,19 @@ def difference_similarity(embeddings, data, pairs):
             print('{:.4f} & '.format(s.item()), end='')
         print(' \\\\\\hline')
 
+def pair_similarity(embeddings, data, pairs):
+    es = []
+    for singular, plural in pairs:
+        i = data.words.index(singular)
+        j = data.words.index(plural)
+        se = embeddings[i, :].reshape(1, -1)
+        pe = embeddings[j, :].reshape(1, -1)
+        es.append((se, pe))
+
+    for i, (sa, pa) in enumerate(es):
+        s = cosine_similarity(sa, pa).item()
+        print('{} & {} & {} & {:.4f} \\\\ \\hline'.format(i, pairs[i][0], pairs[i][1], s))
+
 
 @click.command()
 @click.option('--path', '-p', default='../dataset/corpus.txt', help='path of the dataset file')
@@ -57,8 +70,9 @@ def difference_similarity(embeddings, data, pairs):
 @click.option('--workers', '-w', default=2)
 @click.option('--graph', is_flag=True, default=False)
 @click.option('--check-relations', default=None)
+@click.option('--check-pairs', default=None)
 def main(path: str, limit: int, load_model: str, align: int, batch_size: int, workers: int,
-         graph: bool, check_relations: bool):
+         graph: bool, check_relations: bool, check_pairs: bool):
     # Check if cuda is available
     device = torch.device('cuda:0' if cuda.is_available() else 'cpu')
     click.secho('Using device={}'.format(device), fg='blue')
@@ -94,6 +108,11 @@ def main(path: str, limit: int, load_model: str, align: int, batch_size: int, wo
         with open(check_relations) as f:
             pairs = [tuple(line.strip().split(',')) for line in f]
             difference_similarity(embeddings, data, pairs)
+
+    if check_pairs is not None:
+        with open(check_pairs) as f:
+            pairs = [tuple(line.strip().split(',')) for line in f]
+            pair_similarity(embeddings, data, pairs)
 
     if graph:
         graph_embeddings(embeddings, data)
