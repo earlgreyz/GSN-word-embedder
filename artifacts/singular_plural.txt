@@ -1,0 +1,5 @@
+straty,strata
+miejsce,miejsca
+umowa,umowy
+firma,firmy
+odprawa,odprawy
